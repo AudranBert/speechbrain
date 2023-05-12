@@ -135,6 +135,26 @@ def test_classification_stats():
     assert pytest.approx(classwise_accuracy["C"]) == 0.0
 
 
+def test_classification_stats_confusion():
+    print("")
+    import pytest
+    from speechbrain.utils.metric_stats import ClassificationStats
+
+    stats = ClassificationStats()
+    stats.append(ids=["1", "2"], predictions=["A", "A"], targets=["B", "A"])
+    stats.append(ids=["3", "4"], predictions=["A", "C"], targets=["B", "C"])
+    stats.append(ids=["5", "6"], predictions=["A", "C"], targets=["B", "A"])
+
+    summary = stats.summarize()
+    cm = summary["confusion_matrix"].tolist()
+    assert cm == [[1.0, 0.0, 1.0],[3.0,0.0,0.0],[0.0,0.0,1.0]]
+    assert pytest.approx(summary["accuracy"], 0.01) == (2/6)
+    classwise_accuracy = summary["classwise_accuracy"]
+    assert pytest.approx(classwise_accuracy["A"],0.01) == 0.5
+    assert pytest.approx(classwise_accuracy["B"],0.01) == 0.0
+    assert pytest.approx(classwise_accuracy["C"],0.01) == 1.0
+
+
 def test_categorized_classification_stats():
     import pytest
     from speechbrain.utils.metric_stats import ClassificationStats
@@ -166,6 +186,7 @@ def test_categorized_classification_stats():
     assert pytest.approx(classwise_accuracy["C1", "C"]) == 0.5
     assert pytest.approx(classwise_accuracy["C2", "A"]) == 1.0
     assert pytest.approx(classwise_accuracy["C2", "B"]) == 0.0
+    # print(summary)
 
 
 def test_classification_stats_report():

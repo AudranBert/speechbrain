@@ -779,14 +779,19 @@ class ClassificationStats(MetricStats):
         self._predictions_lookup = self._index_lookup(
             self._available_predictions
         )
+        self._available_all_keys = list(sorted(set(self.targets.copy())))
+        self._all_keys_lookup = self._index_lookup(self._available_all_keys)
+        
+        
 
     def _compute_confusion_matrix(self):
         confusion_matrix = torch.zeros(
-            len(self._available_keys), len(self._available_predictions)
+            len(self._available_keys), len(self._available_all_keys)
         )
+
         for key, prediction in self._get_confusion_entries():
             key_idx = self._keys_lookup[key]
-            prediction_idx = self._predictions_lookup[prediction]
+            prediction_idx = self._all_keys_lookup[prediction]
             confusion_matrix[key_idx, prediction_idx] += 1
         return confusion_matrix
 
@@ -804,10 +809,9 @@ class ClassificationStats(MetricStats):
         )
         correct = torch.tensor(
             [
+
                 (
-                    confusion_matrix[idx, self._predictions_lookup[target]]
-                    if target in self._predictions_lookup
-                    else 0
+                    confusion_matrix[idx, self._all_keys_lookup[target]]
                 )
                 for idx, target in enumerate(key_targets)
             ]
