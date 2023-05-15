@@ -126,16 +126,36 @@ def test_classification_stats():
     stats = ClassificationStats()
     stats.append(ids=["1", "2"], predictions=["B", "A"], targets=["B", "A"])
     stats.append(ids=["3", "4"], predictions=["A", "B"], targets=["B", "C"])
+    stats.append(ids=["5", "6"], predictions=["C", "C"], targets=["D", "D"])
 
     summary = stats.summarize()
-    assert pytest.approx(summary["accuracy"], 0.01) == 0.5
+    assert pytest.approx(summary["accuracy"], 0.01) == 0.33
+
     classwise_accuracy = summary["classwise_accuracy"]
     assert pytest.approx(classwise_accuracy["A"]) == 1.0
     assert pytest.approx(classwise_accuracy["B"]) == 0.5
     assert pytest.approx(classwise_accuracy["C"]) == 0.0
+    assert pytest.approx(classwise_accuracy["D"]) == 0.0
     cm = summary["confusion_matrix"].tolist()
-    assert cm == [[1.0, 0.0, 0.0],[1.0,1.0,0.0],[0.0,1.0,0.0]]
+    assert cm == [[1.0, 0.0, 0.0,0.0],[1.0,1.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0, 0.0, 2.0, 0.0]]
 
+def test_classification_stats_unknown_label():
+    import pytest
+    from speechbrain.utils.metric_stats import ClassificationStats
+
+    stats = ClassificationStats()
+    stats.append(ids=["1", "2"], predictions=["B", "A"], targets=["B", "A"])
+    stats.append(ids=["3", "4"], predictions=["D", "D"], targets=["C", "C"])
+
+    summary = stats.summarize()
+    assert pytest.approx(summary["accuracy"], 0.01) == 0.5
+
+    classwise_accuracy = summary["classwise_accuracy"]
+    assert pytest.approx(classwise_accuracy["A"]) == 1.0
+    assert pytest.approx(classwise_accuracy["B"]) == 1.0
+    assert pytest.approx(classwise_accuracy["C"]) == 0.0
+    cm = summary["confusion_matrix"].tolist()
+    assert cm == [[1.0, 0.0, 0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,0.0,2.0]]
 
 def test_categorized_classification_stats():
     import pytest
@@ -160,6 +180,7 @@ def test_categorized_classification_stats():
         targets=["B", "C"],
         categories=["C2", "C1"],
     )
+
 
     summary = stats.summarize()
     assert pytest.approx(summary["accuracy"], 0.01) == 0.5

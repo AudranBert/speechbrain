@@ -779,7 +779,7 @@ class ClassificationStats(MetricStats):
         self._predictions_lookup = self._index_lookup(
             self._available_predictions
         )
-        self._available_all_keys = list(sorted(set(self.targets.copy())))
+        self._available_all_keys = list(sorted(set(self.targets.copy()+self.predictions.copy())))
         self._all_keys_lookup = self._index_lookup(self._available_all_keys)
         
         
@@ -788,7 +788,6 @@ class ClassificationStats(MetricStats):
         confusion_matrix = torch.zeros(
             len(self._available_keys), len(self._available_all_keys)
         )
-
         for key, prediction in self._get_confusion_entries():
             key_idx = self._keys_lookup[key]
             prediction_idx = self._all_keys_lookup[prediction]
