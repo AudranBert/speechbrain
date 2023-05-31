@@ -137,7 +137,13 @@ def test_classification_stats():
     assert pytest.approx(classwise_accuracy["C"]) == 0.0
     assert pytest.approx(classwise_accuracy["D"]) == 0.0
     cm = summary["confusion_matrix"].tolist()
-    assert cm == [[1.0, 0.0, 0.0,0.0],[1.0,1.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0, 0.0, 2.0, 0.0]]
+    assert cm == [
+        [1.0, 0.0, 0.0, 0.0],
+        [1.0, 1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0, 0.0],
+        [0.0, 0.0, 2.0, 0.0],
+    ]
+
 
 def test_classification_stats_unknown_label():
     import pytest
@@ -155,7 +161,12 @@ def test_classification_stats_unknown_label():
     assert pytest.approx(classwise_accuracy["B"]) == 1.0
     assert pytest.approx(classwise_accuracy["C"]) == 0.0
     cm = summary["confusion_matrix"].tolist()
-    assert cm == [[1.0, 0.0, 0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,0.0,2.0]]
+    assert cm == [
+        [1.0, 0.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 2.0],
+    ]
+
 
 def test_categorized_classification_stats():
     import pytest
@@ -181,7 +192,6 @@ def test_categorized_classification_stats():
         categories=["C2", "C1"],
     )
 
-
     summary = stats.summarize()
     assert pytest.approx(summary["accuracy"], 0.01) == 0.5
     classwise_accuracy = summary["classwise_accuracy"]
@@ -190,7 +200,12 @@ def test_categorized_classification_stats():
     assert pytest.approx(classwise_accuracy["C2", "A"]) == 1.0
     assert pytest.approx(classwise_accuracy["C2", "B"]) == 0.0
     cm = summary["confusion_matrix"].tolist()
-    assert cm == [[0.0, 1.0, 0.0],[0.0,1.0,1.0],[1.0,0.0,0.0], [2.0,0.0,0.0]]
+    assert cm == [
+        [0.0, 1.0, 0.0],
+        [0.0, 1.0, 1.0],
+        [1.0, 0.0, 0.0],
+        [2.0, 0.0, 0.0],
+    ]
 
 
 def test_classification_stats_report():
